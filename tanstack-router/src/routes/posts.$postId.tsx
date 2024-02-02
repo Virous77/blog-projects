@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   ErrorComponent,
   ErrorRouteProps,
@@ -11,7 +10,7 @@ import { postQueryOptions } from "../postQueryOptions";
 export const Route = createFileRoute("/posts/$postId")({
   loader: ({ context: { queryClient }, params: { postId } }) =>
     queryClient.ensureQueryData(postQueryOptions(postId)),
-  errorComponent: PostErrorComponent as any,
+  errorComponent: PostErrorComponent,
   component: PostComponent,
 });
 

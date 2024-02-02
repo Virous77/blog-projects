@@ -1,4 +1,3 @@
-import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PostErrorComponent } from "./posts.$postId";
 import { postQueryOptions } from "../postQueryOptions";
@@ -6,7 +5,7 @@ import { postQueryOptions } from "../postQueryOptions";
 export const Route = createFileRoute("/posts/$postId/deep")({
   loader: ({ context: { queryClient }, params: { postId } }) =>
     queryClient.ensureQueryData(postQueryOptions(postId)),
-  errorComponent: PostErrorComponent as any,
+  errorComponent: PostErrorComponent,
   component: PostDeepComponent,
 });
 

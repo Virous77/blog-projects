@@ -16,10 +16,8 @@
     "@tanstack/router-devtools": "^1.15.7",
     "@tanstack/router-vite-plugin": "^1.15.8",
     "axios": "^1.6.7",
-    "immer": "^10.0.3",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "zod": "^3.22.4"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

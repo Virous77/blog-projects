@@ -1,5 +1,4 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { postsQueryOptions } from "../postsQueryOptions";
 
 export const Route = createFileRoute("/posts")({
@@ -9,8 +8,7 @@ export const Route = createFileRoute("/posts")({
 });
 
 function PostsComponent() {
-  const postsQuery = useSuspenseQuery(postsQueryOptions);
-  const posts = postsQuery.data;
+  const posts = Route.useLoaderData();
 
   return (
     <div className="p-2 flex gap-2">
