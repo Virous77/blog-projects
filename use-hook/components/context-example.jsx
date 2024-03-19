@@ -21,9 +21,9 @@ import { use, useState } from "react";
 
 const ContextExample = () => {
   const [active, setActive] = useState(false);
-  const { state, setState } = use(AppContext);
 
   if (active) {
+    const { state, setState } = use(AppContext);
     return (
       <div>
         <h1>{state}</h1>
