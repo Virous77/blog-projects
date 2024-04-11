@@ -14,19 +14,13 @@ const Client = () => {
     queryFn: () => client.api.index.get(),
   });
 
-  const signUp = async ({ name, password }: SignUp) => {
+  const signUp = async (userData: SignUp) => {
     try {
-      const { data, error } = await client.api.sign.post(
-        {
-          name,
-          password,
+      const { data, error } = await client.api.sign.post(userData, {
+        headers: {
+          Authorization: "Bearer 12345678",
         },
-        {
-          headers: {
-            Authorization: "Bearer 12345",
-          },
-        }
-      );
+      });
       if (error) throw error;
       return data;
     } catch (error) {
@@ -34,24 +28,28 @@ const Client = () => {
     }
   };
 
-  const { mutateAsync, isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: signUp,
+    onError: (error) => {
+      alert(error.message);
+    },
+    onSuccess: (data) => {
+      alert(
+        `You have signed up as ${data.name} with password ${data.password}`
+      );
+    },
   });
 
   const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
-    const userData = Object.fromEntries(formData) as {
-      name: string;
-      password: string;
-    };
+    const userData = Object.fromEntries(formData) as SignUp;
 
     const { name, password } = userData;
     if (password.trim() === "" || name.trim() === "")
       return alert("Fields are required");
-    const data = await mutateAsync(userData);
-    alert(`You have signed up as ${data.name} with password ${data.password}`);
+    mutate(userData);
   };
 
   return (

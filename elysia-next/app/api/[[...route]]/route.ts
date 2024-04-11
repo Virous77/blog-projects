@@ -2,35 +2,16 @@
 import bearer from "@elysiajs/bearer";
 import { Elysia, t } from "elysia";
 
-type TSet = {
-  headers: Record<string, string> & {
-    "Set-Cookie"?: string | string[] | undefined;
-  };
-  status?: any;
-  redirect?: string | undefined;
-  cookie?: Record<string, any> | undefined;
-};
-
-const validateBearer = ({
-  bearer,
-  set,
-}: {
-  bearer: string | undefined;
-  set: TSet;
-}) => {
-  if (!bearer) {
-    set.status = 400;
-    set.headers[
-      "WWW-Authenticate"
-    ] = `Bearer realm='sign', error="invalid_request"`;
-
-    return "Unauthorized";
-  }
-};
-
 const app = new Elysia({ prefix: "/api" })
-  .use(bearer())
   .get("/", () => "Hello from Elysia")
+  .use(bearer())
+  .onBeforeHandle(async ({ bearer, set }) => {
+    if (!bearer) return (set.status = "Unauthorized");
+    const isAuthorized = bearer === "12345678";
+    if (!isAuthorized) {
+      return (set.status = "Unauthorized");
+    }
+  })
   .post(
     "/sign",
     ({ bearer, body }) => {
@@ -41,10 +22,6 @@ const app = new Elysia({ prefix: "/api" })
         name: t.String(),
         password: t.String(),
       }),
-
-      beforeHandle({ bearer, set }) {
-        return validateBearer({ bearer, set });
-      },
     }
   );
 
