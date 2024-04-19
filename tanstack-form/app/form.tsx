@@ -9,6 +9,9 @@ import {
 import action, { TResult } from "./action";
 import { useFormState } from "react-dom";
 import formFactory from "./form-factory";
+import ButtonStatus from "./button-status";
+import { zodValidator } from "@tanstack/zod-form-adapter";
+import { z } from "zod";
 
 const Form = () => {
   const [state, setAction] = useFormState(action, formFactory.initialFormState);
@@ -33,10 +36,22 @@ const Form = () => {
       <form
         action={setAction as never}
         onSubmit={() => handleSubmit()}
-        className="shadow-md p-4 rounded border border-gray-300  flex items-center gap-4 flex-col"
+        className="shadow-md p-4 rounded border border-gray-300  flex items-center gap-4 flex-col w-[500px]"
       >
         <div className="flex flex-col gap-3 w-full">
-          <Field name="age">
+          <Field
+            name="age"
+            validatorAdapter={zodValidator}
+            validators={{
+              onChange: (value) => {
+                if (Number.isNaN(value.value)) return false;
+                const schema = z.number().min(9);
+                const res = schema.safeParse(value.value);
+                if (res.success) return false;
+                return "You must be at least 8 to sign up";
+              },
+            }}
+          >
             {(field) => {
               return (
                 <>
@@ -59,7 +74,13 @@ const Form = () => {
             }}
           </Field>
 
-          <Field name="firstName">
+          <Field
+            name="firstName"
+            validatorAdapter={zodValidator}
+            validators={{
+              onChange: z.string().min(1, "FirstName is required"),
+            }}
+          >
             {(field) => {
               return (
                 <>
@@ -83,23 +104,8 @@ const Form = () => {
           </Field>
         </div>
 
-        <Subscribe
-          selector={(formState) => {
-            return [formState.canSubmit, formState.isSubmitting];
-          }}
-        >
-          {([canSubmit, isSubmitting]) => {
-            console.log(isSubmitting);
-            return (
-              <button
-                type="submit"
-                disabled={!canSubmit}
-                className="bg-blue-500 text-white p-2 rounded w-full"
-              >
-                {isSubmitting ? "Loading..." : "Submit"}
-              </button>
-            );
-          }}
+        <Subscribe selector={(formState) => [formState.canSubmit]}>
+          {([canSubmit]) => <ButtonStatus canSubmit={canSubmit} />}
         </Subscribe>
       </form>
     </section>
@@ -115,6 +121,7 @@ const ErrorText = ({
   children: React.ReactNode;
   error: ValidationError[];
 }) => {
+  console.log(error);
   return (
     <>
       {error.map((error) => (
@@ -122,7 +129,7 @@ const ErrorText = ({
           {error}
         </p>
       ))}
-      <p className="text-red-500 text-xs mt-1">{children}</p>
+      {error.length === 0 && <p className="text-red-500 text-xs">{children}</p>}
     </>
   );
 };

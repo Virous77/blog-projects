@@ -11,7 +11,7 @@ const formFactory = createFormFactory({
     }
 
     if (value.firstName === "") {
-      return "firstName | First name is required";
+      return "firstName | FirstName is required";
     }
   },
 });
