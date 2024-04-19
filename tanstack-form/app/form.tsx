@@ -121,7 +121,6 @@ const ErrorText = ({
   children: React.ReactNode;
   error: ValidationError[];
 }) => {
-  console.log(error);
   return (
     <>
       {error.map((error) => (
