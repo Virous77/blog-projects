@@ -47,3 +47,17 @@ li {
   align-items: center;
   gap: 1rem;
 }
+
+section form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+form input {
+  padding: 8px;
+  outline: none;
+  font-size: 16px;
+  border: 2px solid #eaeaea;
+  border-radius: 5px;
+}

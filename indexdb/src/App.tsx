@@ -1,49 +1,24 @@
-import { useEffect, useState } from "react";
-import { Student } from "./indexdb";
 import {
-  addStudent,
   getStudents,
   deleteStudent,
   updateStudent,
   clearStudents,
 } from "./indexdb/db-utils";
+import StudentForm from "./components/StudentForm";
+import { useLiveQuery } from "dexie-react-hooks";
 
 const App = () => {
-  const [students, setStudents] = useState<Student[]>([]);
-
-  const student = {
-    name: "John Doe",
-    marks: Number(Number(Math.random() * 100).toFixed(2)),
-    college: "XYZ",
-  };
-
-  useEffect(() => {
-    getStudents()
-      .then((students) => {
-        setStudents(students);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  const friends = useLiveQuery(() => getStudents());
 
   return (
     <main>
       <section>
-        <button
-          onClick={() => {
-            addStudent(student);
-            setStudents([...students, student]);
-          }}
-        >
-          Add student
-        </button>
-        <button onClick={getStudents}>Get students</button>
+        <StudentForm />
       </section>
 
       <div>
         <ul>
-          {students.map((student) => (
+          {friends?.map((student) => (
             <li key={student.id}>
               <p>
                 {student.name} - {student.marks} - {student.college}
@@ -51,7 +26,6 @@ const App = () => {
               <button
                 onClick={() => {
                   deleteStudent(student.id!);
-                  setStudents(students.filter((s) => s.id !== student.id));
                 }}
               >
                 Delete
@@ -63,21 +37,6 @@ const App = () => {
                     marks: Number(Number(Math.random() * 100).toFixed(2)),
                     college: "ABC",
                   });
-
-                  setStudents(
-                    students.map((s) =>
-                      s.id === student.id
-                        ? {
-                            ...s,
-                            name: "Jane Max",
-                            marks: Number(
-                              Number(Math.random() * 100).toFixed(2)
-                            ),
-                            college: "ABC",
-                          }
-                        : s
-                    )
-                  );
                 }}
               >
                 Update
@@ -88,7 +47,6 @@ const App = () => {
         <button
           onClick={() => {
             clearStudents();
-            setStudents([]);
           }}
         >
           Clear db
