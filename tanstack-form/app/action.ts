@@ -1,7 +1,9 @@
 "use server";
 
-import formFactory from "./form-factory";
-const initialState = formFactory.initialFormState.values!;
+import { ServerValidateError } from "@tanstack/react-form/nextjs";
+import { formOpts, serverValidate } from "./form-factory";
+
+const initialState = formOpts?.defaultValues!;
 export type TResult = typeof initialState;
 
 const getFormData = (formData: FormData) => {
@@ -14,16 +16,21 @@ const getFormData = (formData: FormData) => {
   return result;
 };
 
-const action = async (prev: unknown, formData: FormData) => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+const formAction = async (prev: unknown, formData: FormData) => {
+  try {
+    await serverValidate(formData);
 
-  const res = await formFactory.validateFormData(formData);
-  if (res.errors && res.errors?.length > 0) return res;
+    const data = getFormData(formData);
+    // Do something with the data
+    console.log(data);
+  } catch (error) {
+    if (error instanceof ServerValidateError) {
+      return error.formState;
+    }
+    throw error;
+  }
 
-  const data = getFormData(formData);
-  console.log(data);
-
-  return res;
+  return formOpts?.defaultValues;
 };
 
-export default action;
+export default formAction;

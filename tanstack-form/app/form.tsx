@@ -3,20 +3,23 @@
 import {
   FormApi,
   mergeForm,
+  useForm,
   useTransform,
   ValidationError,
 } from "@tanstack/react-form";
 import action, { TResult } from "./action";
 import { useFormState } from "react-dom";
-import formFactory from "./form-factory";
 import ButtonStatus from "./button-status";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { z } from "zod";
+import { formOpts } from "./form-factory";
+import { initialFormState } from "@tanstack/react-form/nextjs";
 
 const Form = () => {
-  const [state, setAction] = useFormState(action, formFactory.initialFormState);
+  const [state, setAction] = useFormState(action, initialFormState);
 
-  const { useStore, Subscribe, handleSubmit, Field } = formFactory.useForm({
+  const { useStore, Subscribe, handleSubmit, Field } = useForm({
+    ...formOpts,
     transform: useTransform(
       (baseForm: FormApi<any, any>) => mergeForm(baseForm, state),
       [state]
@@ -24,7 +27,7 @@ const Form = () => {
   });
 
   const formErrors = useStore((formState) => formState.errors);
-  const errors = formErrors.reduce((acc, curr) => {
+  const serverErrors = formErrors.reduce((acc, curr) => {
     if (!curr) return acc;
     const [key, value] = curr.split(" | ");
     const result = { ...acc, [key]: value };
@@ -41,7 +44,7 @@ const Form = () => {
         <div className="flex flex-col gap-3 w-full">
           <Field
             name="age"
-            validatorAdapter={zodValidator}
+            validatorAdapter={zodValidator()}
             validators={{
               onChange: (value) => {
                 if (Number.isNaN(value.value)) return false;
@@ -67,7 +70,7 @@ const Form = () => {
                     onChange={(e) => field.handleChange(e.target.valueAsNumber)}
                   />
                   <ErrorText error={field.state.meta.errors}>
-                    {errors?.age}
+                    {serverErrors?.age}
                   </ErrorText>
                 </>
               );
@@ -76,7 +79,7 @@ const Form = () => {
 
           <Field
             name="firstName"
-            validatorAdapter={zodValidator}
+            validatorAdapter={zodValidator()}
             validators={{
               onChange: z.string().min(1, "FirstName is required"),
             }}
@@ -96,7 +99,7 @@ const Form = () => {
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
                   <ErrorText error={field.state.meta.errors}>
-                    {errors?.firstName}
+                    {serverErrors?.firstName}
                   </ErrorText>
                 </>
               );
