@@ -1,13 +1,13 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 
-export interface AuthContext {
+export interface IAuthContext {
   isAuthenticated: boolean;
   login: (username: string) => Promise<void>;
   logout: () => Promise<void>;
   user: string | null;
 }
 
-const AuthContext = React.createContext<AuthContext | null>(null);
+const AuthContext = React.createContext<IAuthContext | null>(null);
 const key = "tanstack.auth.user";
 
 const getLocalData = () => {
